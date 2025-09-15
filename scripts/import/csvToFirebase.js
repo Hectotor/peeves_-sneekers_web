@@ -64,6 +64,8 @@ async function importCsvToFirestore() {
         usage: row.usage || '',
         productDisplayName: row.productDisplayName || '',
         quantity: randomQuantity, // Ajout de la quantité aléatoire
+        imageUrl: `https://storage.googleapis.com/peeves-sneakers-web.appspot.com/products/${row.id}.png`, // URL directe vers l'image
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
       
