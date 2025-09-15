@@ -1,103 +1,106 @@
 import Image from "next/image";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-white">
+      {/* Section Hero */}
+      <div className="relative bg-gray-900">
+        <div className="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
+          <Image
+            className="h-full w-full object-cover"
+            src="/hero-sneakers.jpg"
+            alt=""
+            width={1920}
+            height={1080}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+          <div className="md:ml-auto md:w-1/2 md:pl-10">
+            <h2 className="text-lg font-semibold text-gray-300">Nouvelle collection</h2>
+            <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Des sneakers qui vous ressemblent
+            </p>
+            <p className="mt-3 text-lg text-gray-300">
+              Découvrez notre sélection exclusive de sneakers pour hommes et femmes. Confort, style et qualité supérieure.
+            </p>
+            <div className="mt-8">
+              <div className="inline-flex rounded-md shadow">
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-indigo-600 hover:bg-gray-50"
+                >
+                  Découvrir la collection
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section marques */}
+      <div className="bg-gray-50 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm font-semibold uppercase tracking-wide text-gray-500">
+            Nos marques partenaires
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-8 md:grid-cols-5">
+            <div className="col-span-1 flex justify-center">
+              <img 
+                className="h-12 w-auto" 
+                src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" 
+                alt="Tuple" 
+              />
+            </div>
+            <div className="col-span-1 flex justify-center">
+              <img 
+                className="h-12 w-auto" 
+                src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" 
+                alt="Mirage" 
+              />
+            </div>
+            <div className="col-span-1 flex justify-center">
+              <img 
+                className="h-12 w-auto" 
+                src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" 
+                alt="StaticKit" 
+              />
+            </div>
+            <div className="col-span-1 flex justify-center">
+              <img 
+                className="h-12 w-auto" 
+                src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" 
+                alt="Transistor" 
+              />
+            </div>
+            <div className="col-span-1 flex justify-center">
+              <img 
+                className="h-12 w-auto" 
+                src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" 
+                alt="Workcation" 
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section Produits en vedette */}
+      <div className="bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Nos meilleures ventes
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-500">
+              Découvrez les modèles préférés de nos clients
+            </p>
+          </div>
+          
+          <div className="mt-12">
+            <FeaturedProducts />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
