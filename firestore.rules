@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Règles pour les produits
+    match /products/{productId} {
+      // Tout le monde peut lire les produits
+      allow read: if true;
+      
+      // Seuls les utilisateurs authentifiés avec le rôle admin peuvent modifier
+      allow create, update, delete: if request.auth != null && 
+                                  request.auth.token.admin == true;
+    }
+    
+    // Règles pour les commandes (exemple supplémentaire)
+    match /orders/{orderId} {
+      // Les utilisateurs peuvent lire/modifier uniquement leurs propres commandes
+      allow read, update: if request.auth != null && 
+                         request.auth.uid == request.resource.data.userId;
+      
+      // Les administrateurs peuvent tout faire
+      allow read, write: if request.auth != null && 
+                        request.auth.token.admin == true;
+    }
+  }
+}
