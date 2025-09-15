@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   images: {
-    domains: ['images.unsplash.com', 'tailwindui.com'],
+    domains: ['images.unsplash.com', 'tailwindui.com', 'via.placeholder.com', 'storage.googleapis.com'],
   },
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');

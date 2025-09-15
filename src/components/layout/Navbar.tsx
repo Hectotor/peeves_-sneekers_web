@@ -27,14 +27,22 @@ export default function Navbar() {
             <div className="flex h-16 justify-between">
               <div className="flex items-center">
                 <div className="flex flex-shrink-0 items-center">
-                  <Link href="/">
-                    <Image
-                      className="h-8 w-auto"
-                      src="/logo.svg"
-                      alt="Peeves Sneakers"
-                      width={32}
-                      height={32}
-                    />
+                  <Link href="/" className="flex items-center">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-600 text-white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <span className="ml-2 text-xl font-bold text-gray-900">Peeves</span>
                   </Link>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

@@ -9,10 +9,11 @@ export default function Home() {
         <div className="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
           <Image
             className="h-full w-full object-cover"
-            src="/hero-sneakers.jpg"
-            alt=""
+            src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80"
+            alt="Collection de sneakers"
             width={1920}
             height={1080}
+            priority
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
