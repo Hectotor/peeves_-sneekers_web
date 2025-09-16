@@ -4,7 +4,7 @@ import Image from "next/image";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 
 export default function Home() {
-  type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
+  type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN' | 'PROMOS';
   const [brandFilter, setBrandFilter] = useState<BrandFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   return (
@@ -90,26 +90,29 @@ export default function Home() {
               Spécialisés grandes pointures: 46 à 57
             </p>
             {/* Pilules de filtre sous le sous-titre */}
-            <div className="mt-6 flex items-center justify-center gap-3">
-              {[
-                { key: 'ALL', label: 'Tous' },
-                { key: 'NIKE', label: 'Nike' },
-                { key: 'JORDAN', label: 'Jordan' },
-              ].map((pill) => (
-                <button
-                  key={pill.key}
-                  onClick={() => setBrandFilter(pill.key as BrandFilter)}
-                  className={
-                    `rounded-full border px-4 py-1.5 text-sm transition-colors ${
-                      brandFilter === pill.key
-                        ? 'bg-indigo-600 text-white border-indigo-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`
-                  }
-                >
-                  {pill.label}
-                </button>
-              ))}
+            <div className="mt-6 flex w-full justify-center">
+              <div className="grid w-full max-w-xl grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { key: 'ALL', label: 'Tous' },
+                  { key: 'NIKE', label: 'Nike' },
+                  { key: 'JORDAN', label: 'Jordan' },
+                  { key: 'PROMOS', label: 'Promos' },
+                ].map((pill) => (
+                  <button
+                    key={pill.key}
+                    onClick={() => setBrandFilter(pill.key as BrandFilter)}
+                    className={
+                      `w-full rounded-md border px-4 py-2.5 text-sm md:text-base transition-colors ${
+                        brandFilter === pill.key
+                          ? 'bg-indigo-600 text-white border-indigo-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`
+                    }
+                  >
+                    {pill.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Barre de recherche */}

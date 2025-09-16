@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { fetchProducts } from '@/services/productService';
 import { Product } from '@/services/firebase';
 
-type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
+type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN' | 'PROMOS';
 
 export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = '' }: { brandFilter?: BrandFilter; searchQuery?: string }) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -100,6 +100,11 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
                   const name = (p.name || '').toLowerCase();
                   if (brandFilter === 'NIKE') return name.startsWith('nike');
                   if (brandFilter === 'JORDAN') return name.startsWith('jordan');
+                  if (brandFilter === 'PROMOS') {
+                    const hasOriginal = typeof p.original === 'number' && p.original > 0;
+                    const discounted = hasOriginal && typeof p.final === 'number' && (p.final as number) < (p.original as number);
+                    return p.isOnSale || discounted;
+                  }
                   return true;
                 });
                 const q = searchQuery.trim().toLowerCase();
@@ -140,9 +145,29 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
                       En stock: {product.quantity}
                     </p>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {priceFormatter.format(product.final ?? product.original ?? 0)}
-                  </p>
+                  {(() => {
+                    const finalPrice = product.final ?? product.original ?? 0;
+                    const hasOriginal = typeof product.original === 'number' && product.original > 0;
+                    const discount = hasOriginal && typeof product.final === 'number' && product.final < (product.original as number);
+                    const percent = discount ? Math.round(((product.original as number) - (product.final as number)) / (product.original as number) * 100) : 0;
+                    return (
+                      <div className="text-right">
+                        <div className="flex flex-col items-end">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-sm font-semibold text-gray-900">{priceFormatter.format(finalPrice)}</span>
+                            {discount && (
+                              <span className="text-xs text-gray-500 line-through">{priceFormatter.format(product.original as number)}</span>
+                            )}
+                          </div>
+                          {discount && (
+                            <span className="mt-1 inline-flex items-center rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600 ring-1 ring-inset ring-red-200">
+                              -{percent}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
                 ));
@@ -156,6 +181,11 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
                 const name = (p.name || '').toLowerCase();
                 if (brandFilter === 'NIKE') return name.startsWith('nike');
                 if (brandFilter === 'JORDAN') return name.startsWith('jordan');
+                if (brandFilter === 'PROMOS') {
+                  const hasOriginal = typeof p.original === 'number' && p.original > 0;
+                  const discounted = hasOriginal && typeof p.final === 'number' && (p.final as number) < (p.original as number);
+                  return p.isOnSale || discounted;
+                }
                 return true;
               }).length;
               const q = searchQuery.trim().toLowerCase();
