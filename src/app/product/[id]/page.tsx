@@ -6,9 +6,16 @@ export default async function ProductPage({ params }: { params: { id: string } }
   const product = await fetchProductById(params.id);
   if (!product) return notFound();
 
+  // Serialize Firestore Timestamp fields before passing to a Client Component
+  const safeProduct = {
+    ...product,
+    updatedAt: (product as any).updatedAt?.toMillis ? (product as any).updatedAt.toMillis() : (product as any).updatedAt ?? null,
+    createdAt: (product as any).createdAt?.toMillis ? (product as any).createdAt.toMillis() : (product as any).createdAt ?? null,
+  } as any;
+
   return (
     <div className="bg-white">
-      <ProductDetail product={product} />
+      <ProductDetail product={safeProduct} />
     </div>
   );
 }
