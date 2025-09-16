@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -19,6 +19,36 @@ function classNames(...classes: string[]) {
 }
 
 export default function Navbar() {
+  const [cartCount, setCartCount] = useState<number>(0);
+
+  // Read cart from localStorage and update count
+  const refreshCartCount = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('cart');
+      const cart = raw ? JSON.parse(raw) : [];
+      const count = Array.isArray(cart)
+        ? cart.reduce((acc: number, item: any) => acc + (Number(item?.qty) || 1), 0)
+        : 0;
+      setCartCount(count);
+    } catch {
+      setCartCount(0);
+    }
+  };
+
+  useEffect(() => {
+    refreshCartCount();
+    const onCustom = () => refreshCartCount();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'cart') refreshCartCount();
+    };
+    window.addEventListener('cart:updated', onCustom as EventListener);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('cart:updated', onCustom as EventListener);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
   return (
     <Disclosure as="nav" className="bg-white shadow-sm">
       {({ open }) => (
@@ -64,13 +94,20 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                <button
-                  type="button"
-                  className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  <span className="sr-only">Panier</span>
-                  <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {cartCount > 0 && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      {cartCount}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    <span className="sr-only">Panier</span>
+                    <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </div>
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
@@ -178,13 +215,22 @@ export default function Navbar() {
                 <div className="ml-3">
                   <div className="text-base font-medium text-gray-800">Mon compte</div>
                 </div>
-                <button
-                  type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  <span className="sr-only">Voir les notifications</span>
-                  <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                <div className="ml-auto flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    {cartCount > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        {cartCount}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      <span className="sr-only">Panier</span>
+                      <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="mt-3 space-y-1">
                 <Disclosure.Button

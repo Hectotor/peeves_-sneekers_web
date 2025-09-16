@@ -44,6 +44,8 @@ export default function ProductDetail({ product }: Props) {
         const cart = raw ? JSON.parse(raw) : [];
         cart.push(item);
         localStorage.setItem("cart", JSON.stringify(cart));
+        // Notify listeners (e.g., Navbar) that the cart changed
+        window.dispatchEvent(new Event("cart:updated"));
       }
     } finally {
       setAdding(false);
