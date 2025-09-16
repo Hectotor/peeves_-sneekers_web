@@ -4,7 +4,7 @@ const path = require('path');
 const { db, admin } = require('./firebaseConfig');
 
 // Configuration
-const CSV_FILE_PATH = path.join(__dirname, 'styles.csv'); // Chemin vers votre fichier CSV
+const CSV_FILE_PATH = path.join(__dirname, 'footlocker_products.csv'); // Chemin vers le fichier CSV
 const COLLECTION_NAME = 'products'; // Nom de la collection Firestore
 
 async function importCsvToFirestore() {
@@ -26,14 +26,21 @@ async function importCsvToFirestore() {
 
       stream.pipe(csv({
         separator: ';', // Utilisation du point-virgule comme séparateur
-        skipLines: 0,   // Ne pas sauter de lignes (l'en-tête est sur la première ligne)
+        skipLines: 1,   // Sauter la première ligne (en-tête du tableau)
         headers: [
-          'id', 'gender', 'masterCategory', 'subCategory', 
-          'articleType', 'baseColour', 'season', 'year', 
-          'usage', 'productDisplayName'
+          'image', 'name.primary', 'name.alt', 'price.final', 'price.original'
         ]
       }))
-        .on('data', (data) => results.push(data))
+        .on('data', (data) => {
+          // Nettoyer les données
+          if (data['price.original']) {
+            data['price.original'] = data['price.original'].trim();
+          }
+          if (data['price.final']) {
+            data['price.final'] = data['price.final'].trim();
+          }
+          results.push(data);
+        })
         .on('end', resolve)
         .on('error', reject);
     });
@@ -45,27 +52,27 @@ async function importCsvToFirestore() {
     const collectionRef = db.collection(COLLECTION_NAME);
     
     for (const [index, row] of results.entries()) {
-      // Créer un document avec l'ID du produit s'il existe, sinon Firestore en génère un
-      const docRef = row.id ? collectionRef.doc(String(row.id)) : collectionRef.doc();
+      // Créer un document avec un ID généré par Firestore
+      const docRef = collectionRef.doc();
       
-      // Générer une quantité aléatoire entre 0 et 1000
-      const randomQuantity = Math.floor(Math.random() * 1001);
+      // Convertir les prix en nombres
+      const originalPrice = row['price.original'] ? 
+        parseFloat(row['price.original'].replace('€', '').trim().replace(',', '.')) : null;
+      
+      const finalPrice = row['price.final'] ? 
+        parseFloat(row['price.final'].replace('€', '').trim().replace(',', '.')) : null;
       
       // Préparer les données pour Firestore
       const productData = {
-        id: row.id || docRef.id,
-        gender: row.gender || '',
-        masterCategory: row.masterCategory || '',
-        subCategory: row.subCategory || '',
-        articleType: row.articleType || '',
-        baseColour: row.baseColour || '',
-        season: row.season || '',
-        year: row.year ? Number(row.year) : null,
-        usage: row.usage || '',
-        productDisplayName: row.productDisplayName || '',
-        quantity: randomQuantity, // Ajout de la quantité aléatoire
-        price: Math.floor(Math.random() * (300 - 60 + 1)) + 60, // Prix aléatoire entre 60 et 300€
-        imageUrl: `https://storage.googleapis.com/peeves-sneakers-web.appspot.com/products/${row.id}.png`, // URL directe vers l'image
+        id: docRef.id,
+        name: row['name.primary'] || '',
+        alt: row['name.alt'] || '',
+        final: finalPrice,
+        original: originalPrice,
+        currency: 'EUR',
+        isOnSale: !!originalPrice && (originalPrice > finalPrice),
+        imageUrl: row['image'] || '',
+        quantity: Math.floor(Math.random() * 100), // Quantité aléatoire entre 0 et 100
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
@@ -73,8 +80,8 @@ async function importCsvToFirestore() {
       batch.set(docRef, productData);
       
       // Afficher la progression
-      if ((index + 1) % 100 === 0) {
-        console.log(`${index + 1} produits traités...`);
+      if ((index + 1) % 10 === 0 || index === 0) {
+        console.log(`${index + 1}/${results.length} produits traités...`);
       }
     }
     
