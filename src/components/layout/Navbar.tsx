@@ -5,6 +5,9 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { auth } from '@/services/firebase';
+import { useRouter } from 'next/navigation';
 
 const navigation = [
   { name: 'Accueil', href: '/', current: true },
@@ -18,6 +21,8 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
   const [cartCount, setCartCount] = useState<number>(0);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const router = useRouter();
 
   // Read cart from localStorage and update count
   const refreshCartCount = () => {
@@ -42,9 +47,11 @@ export default function Navbar() {
     };
     window.addEventListener('cart:updated', onCustom as EventListener);
     window.addEventListener('storage', onStorage);
+    const unsub = onAuthStateChanged(auth, (u) => setCurrentUser(u));
     return () => {
       window.removeEventListener('cart:updated', onCustom as EventListener);
       window.removeEventListener('storage', onStorage);
+      unsub();
     };
   }, []);
   return (
@@ -118,28 +125,34 @@ export default function Navbar() {
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!currentUser) router.push('/login'); else router.push('/account');
+                            }}
                             className={classNames(
                               active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm text-gray-700'
+                              'block w-full text-left px-4 py-2 text-sm text-gray-700'
                             )}
                           >
                             Mon compte
-                          </a>
+                          </button>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!currentUser) router.push('/login'); else router.push('/orders');
+                            }}
                             className={classNames(
                               active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm text-gray-700'
+                              'block w-full text-left px-4 py-2 text-sm text-gray-700'
                             )}
                           >
                             Commandes
-                          </a>
+                          </button>
                         )}
                       </Menu.Item>
                       <Menu.Item>

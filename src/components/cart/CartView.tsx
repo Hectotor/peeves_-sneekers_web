@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { auth } from "@/services/firebase";
+import { useRouter } from "next/navigation";
 
 type CartItem = {
   id: string;
@@ -16,6 +19,8 @@ type CartItem = {
 
 export default function CartView() {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const router = useRouter();
 
   const price = useMemo(
     () =>
@@ -41,6 +46,7 @@ export default function CartView() {
 
   useEffect(() => {
     load();
+    const unsub = onAuthStateChanged(auth, (u) => setCurrentUser(u));
     const onCustom = () => load();
     const onStorage = (e: StorageEvent) => {
       if (e.key === "cart") load();
@@ -50,6 +56,7 @@ export default function CartView() {
     return () => {
       window.removeEventListener("cart:updated", onCustom as EventListener);
       window.removeEventListener("storage", onStorage);
+      unsub();
     };
   }, []);
 
@@ -186,7 +193,19 @@ export default function CartView() {
               </div>
             </div>
 
-            <button className="mt-6 w-full rounded-md bg-indigo-600 px-4 py-2.5 text-white hover:bg-indigo-500 shadow-sm">Passer la commande</button>
+            <button
+              className="mt-6 w-full rounded-md bg-indigo-600 px-4 py-2.5 text-white hover:bg-indigo-500 shadow-sm"
+              onClick={() => {
+                if (!currentUser) {
+                  router.push("/login");
+                } else {
+                  // TODO: implement checkout flow
+                  router.push("/");
+                }
+              }}
+            >
+              Passer la commande
+            </button>
             <button className="mt-3 w-full rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" onClick={clearCart}>Vider le panier</button>
             <p className="mt-3 text-xs text-gray-500">Livraison estimée sous 3–5 jours ouvrés.</p>
           </div>
