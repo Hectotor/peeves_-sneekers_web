@@ -199,8 +199,7 @@ export default function CartView() {
                 if (!currentUser) {
                   router.push("/login");
                 } else {
-                  // TODO: implement checkout flow
-                  router.push("/");
+                  router.push("/checkout");
                 }
               }}
             >
