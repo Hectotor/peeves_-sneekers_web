@@ -8,10 +8,12 @@ import { Product } from '@/services/firebase';
 
 type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
 
-export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?: BrandFilter }) {
+export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = '' }: { brandFilter?: BrandFilter; searchQuery?: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 25;
  
   const priceFormatter = new Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -21,7 +23,7 @@ export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await fetchProducts(8); // Récupérer 8 produits
+        const data = await fetchProducts(300); // Récupérer un lot suffisant pour la pagination côté client
         setProducts(data);
       } catch (err) {
         console.error('Failed to load products:', err);
@@ -33,6 +35,11 @@ export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?
 
     loadProducts();
   }, []);
+
+  // Réinitialiser la page courante si le filtre ou la recherche change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [brandFilter, searchQuery]);
 
   if (loading) {
     return (
@@ -85,52 +92,41 @@ export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?
             <p className="text-gray-500">Aucun produit disponible pour le moment.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-            {products
-              .filter((p) => {
-                if (brandFilter === 'ALL') return true;
-                const name = (p.name || '').toLowerCase();
-                if (brandFilter === 'NIKE') return name.startsWith('nike');
-                if (brandFilter === 'JORDAN') return name.startsWith('jordan');
-                return true;
-              })
-              .map((product) => (
+          <>
+            <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-6">
+              {(() => {
+                const filtered = products.filter((p) => {
+                  if (brandFilter === 'ALL') return true;
+                  const name = (p.name || '').toLowerCase();
+                  if (brandFilter === 'NIKE') return name.startsWith('nike');
+                  if (brandFilter === 'JORDAN') return name.startsWith('jordan');
+                  return true;
+                });
+                const q = searchQuery.trim().toLowerCase();
+                const filteredBySearch = q ? filtered.filter(p => (p.name || '').toLowerCase().includes(q)) : filtered;
+                const totalPages = Math.max(1, Math.ceil(filteredBySearch.length / ITEMS_PER_PAGE));
+                const start = (currentPage - 1) * ITEMS_PER_PAGE;
+                const pageItems = filteredBySearch.slice(start, start + ITEMS_PER_PAGE);
+                return pageItems.map((product) => (
               <div key={product.id} className="group relative">
-                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                  <div className="relative h-full w-full bg-gray-100 flex items-center justify-center">
-                    {product.imageUrl ? (
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.alt || product.name}
-                        className="h-full w-full object-cover object-center"
-                        width={300}
-                        height={400}
-                        priority
-                        onError={(e) => {
-                          const container = (e.target as HTMLElement).parentElement;
-                          if (container) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'p-4 text-center text-gray-500';
-                            errorDiv.innerHTML = `
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              <p class="mt-2 text-sm">Image non disponible</p>
-                            `;
-                            container.innerHTML = '';
-                            container.appendChild(errorDiv);
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="p-4 text-center text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p className="mt-2 text-sm">Aucune image</p>
-                      </div>
-                    )}
-                  </div>
+                <div className="relative w-full overflow-hidden rounded-md bg-white border border-gray-100 aspect-square group-hover:opacity-90">
+                  {product.imageUrl ? (
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.alt || product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                      className="object-contain p-4"
+                      priority
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center p-4 text-center text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="mt-2 text-sm">Aucune image</p>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-4 flex justify-between">
                   <div>
@@ -141,9 +137,6 @@ export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?
                       </Link>
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {product.brand ? `${product.brand}${product.category ? ' • ' + product.category : ''}` : (product.category || product.alt || '')}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
                       En stock: {product.quantity}
                     </p>
                   </div>
@@ -152,8 +145,76 @@ export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
+                ));
+              })()}
+            </div>
+
+            {/* Pagination */}
+            {(() => {
+              const filteredCount = products.filter((p) => {
+                if (brandFilter === 'ALL') return true;
+                const name = (p.name || '').toLowerCase();
+                if (brandFilter === 'NIKE') return name.startsWith('nike');
+                if (brandFilter === 'JORDAN') return name.startsWith('jordan');
+                return true;
+              }).length;
+              const q = searchQuery.trim().toLowerCase();
+              const searchCount = q ? products.filter((p) => (p.name || '').toLowerCase().includes(q)).length : filteredCount;
+              const totalPages = Math.max(1, Math.ceil(searchCount / ITEMS_PER_PAGE));
+
+              const makePages = (): (number | string)[] => {
+                const pages: (number | string)[] = [];
+                const add = (p: number | string) => pages.push(p);
+                if (totalPages <= 7) {
+                  for (let i = 1; i <= totalPages; i++) add(i);
+                } else {
+                  const start = Math.max(2, currentPage - 1);
+                  const end = Math.min(totalPages - 1, currentPage + 1);
+                  add(1);
+                  if (start > 2) add('...');
+                  for (let i = start; i <= end; i++) add(i);
+                  if (end < totalPages - 1) add('...');
+                  add(totalPages);
+                }
+                return pages;
+              };
+
+              return (
+                <div className="mt-10 flex items-center justify-center gap-2">
+                  <button
+                    className={`px-3 py-1.5 text-sm rounded border ${currentPage === 1 ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Précédent
+                  </button>
+                  {makePages().map((p, idx) => (
+                    <button
+                      key={`${p}-${idx}`}
+                      className={`px-3 py-1.5 text-sm rounded border ${
+                        p === '...'
+                          ? 'text-gray-500 border-transparent cursor-default'
+                          : (p as number) === currentPage
+                            ? 'bg-indigo-600 text-white border-indigo-600'
+                            : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => typeof p === 'number' && setCurrentPage(p as number)}
+                      disabled={p === '...'}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  <button
+                    className={`px-3 py-1.5 text-sm rounded border ${currentPage === totalPages ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Suivant
+                  </button>
+                </div>
+              );
+            })()}
+          </>
         )}
 
         <div className="mt-8 text-center md:hidden">

@@ -6,6 +6,7 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 export default function Home() {
   type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
   const [brandFilter, setBrandFilter] = useState<BrandFilter>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   return (
     <div className="min-h-screen bg-white">
       {/* Section Hero */}
@@ -77,7 +78,7 @@ export default function Home() {
 
       {/* Section Produits en vedette */}
       <div className="bg-white py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-none px-1 sm:px-2 lg:px-3">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Tous les produits
@@ -110,10 +111,28 @@ export default function Home() {
                 </button>
               ))}
             </div>
+
+            {/* Barre de recherche */}
+            <div className="mt-4 flex w-full justify-center">
+              <div className="relative w-full max-w-xl">
+                <label htmlFor="product-search" className="sr-only">Rechercher un produit</label>
+                <input
+                  id="product-search"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher par nom (ex: Air Max, Jordan AJ1, Tuned...)"
+                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+                <svg className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" />
+                </svg>
+              </div>
+            </div>
           </div>
           
           <div className="mt-12">
-            <FeaturedProducts brandFilter={brandFilter} />
+            <FeaturedProducts brandFilter={brandFilter} searchQuery={searchQuery} />
           </div>
         </div>
       </div>
