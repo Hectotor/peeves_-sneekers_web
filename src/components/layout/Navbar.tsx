@@ -5,7 +5,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { useRouter } from 'next/navigation';
 
@@ -157,15 +157,22 @@ export default function Navbar() {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await signOut(auth);
+                              } finally {
+                                router.push('/login');
+                              }
+                            }}
                             className={classNames(
                               active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm text-gray-700'
+                              'block w-full text-left px-4 py-2 text-sm text-gray-700'
                             )}
                           >
                             Se déconnecter
-                          </a>
+                          </button>
                         )}
                       </Menu.Item>
                     </Menu.Items>
