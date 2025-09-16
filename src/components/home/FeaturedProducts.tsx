@@ -6,10 +6,17 @@ import { useEffect, useState } from 'react';
 import { fetchProducts } from '@/services/productService';
 import { Product } from '@/services/firebase';
 
-export default function FeaturedProducts() {
+type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
+
+export default function FeaturedProducts({ brandFilter = 'ALL' }: { brandFilter?: BrandFilter }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+ 
+  const priceFormatter = new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  });
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -79,14 +86,22 @@ export default function FeaturedProducts() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-            {products.map((product) => (
+            {products
+              .filter((p) => {
+                if (brandFilter === 'ALL') return true;
+                const name = (p.name || '').toLowerCase();
+                if (brandFilter === 'NIKE') return name.startsWith('nike');
+                if (brandFilter === 'JORDAN') return name.startsWith('jordan');
+                return true;
+              })
+              .map((product) => (
               <div key={product.id} className="group relative">
                 <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
                   <div className="relative h-full w-full bg-gray-100 flex items-center justify-center">
                     {product.imageUrl ? (
                       <Image
                         src={product.imageUrl}
-                        alt={product.productDisplayName}
+                        alt={product.alt || product.name}
                         className="h-full w-full object-cover object-center"
                         width={300}
                         height={400}
@@ -122,18 +137,18 @@ export default function FeaturedProducts() {
                     <h3 className="text-sm text-gray-700">
                       <Link href={`/product/${product.id}`}>
                         <span aria-hidden="true" className="absolute inset-0" />
-                        {product.productDisplayName}
+                        {product.name}
                       </Link>
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {product.gender} • {product.articleType}
+                      {product.brand ? `${product.brand}${product.category ? ' • ' + product.category : ''}` : (product.category || product.alt || '')}
                     </p>
                     <p className="mt-1 text-sm text-gray-500">
                       En stock: {product.quantity}
                     </p>
                   </div>
                   <p className="text-sm font-medium text-gray-900">
-                    {product.price?.toFixed(2)} €
+                    {priceFormatter.format(product.final ?? product.original ?? 0)}
                   </p>
                 </div>
               </div>

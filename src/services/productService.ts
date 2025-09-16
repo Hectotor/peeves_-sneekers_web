@@ -3,10 +3,10 @@ import { getProducts, getProductById, Product } from './firebase';
 export const fetchProducts = async (limit: number = 20): Promise<Product[]> => {
   try {
     const products = await getProducts(limit);
-    // Ajouter un prix aléatoire pour l'exemple si non défini
     return products.map(product => ({
       ...product,
-      price: product.price || Math.floor(Math.random() * 200) + 50 // Prix entre 50 et 250
+      // Utiliser le prix final comme prix principal
+      price: product.final || 0
     }));
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -20,7 +20,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
     if (product) {
       return {
         ...product,
-        price: product.price || Math.floor(Math.random() * 200) + 50 // Prix entre 50 et 250
+        price: product.final || 0
       };
     }
     return null;
@@ -31,20 +31,35 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
 };
 
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {
-  const products = await fetchProducts(100); // Récupérer plus de produits pour la recherche
+  const products = await fetchProducts(100);
   return products.filter(product => 
-    product.articleType.toLowerCase() === category.toLowerCase() ||
-    product.subCategory.toLowerCase() === category.toLowerCase()
+    (product.category?.toLowerCase() === category.toLowerCase()) ||
+    (product.brand?.toLowerCase() === category.toLowerCase())
   );
 };
 
 export const searchProducts = async (query: string): Promise<Product[]> => {
-  const products = await fetchProducts(100); // Récupérer plus de produits pour la recherche
+  const products = await fetchProducts(100);
   const searchTerm = query.toLowerCase();
   
   return products.filter(product => 
-    product.productDisplayName.toLowerCase().includes(searchTerm) ||
-    product.articleType.toLowerCase().includes(searchTerm) ||
-    product.baseColour.toLowerCase().includes(searchTerm)
+    (product.name?.toLowerCase().includes(searchTerm)) ||
+    (product.alt?.toLowerCase().includes(searchTerm)) ||
+    (product.brand?.toLowerCase().includes(searchTerm)) ||
+    (product.category?.toLowerCase().includes(searchTerm))
   );
+};
+
+export const getProductsOnSale = async (limit: number = 20): Promise<Product[]> => {
+  const products = await fetchProducts(100);
+  return products
+    .filter(product => product.isOnSale)
+    .slice(0, limit);
+};
+
+export const getNewArrivals = async (limit: number = 20): Promise<Product[]> => {
+  const products = await fetchProducts(limit);
+  return products.sort((a, b) => 
+    (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)
+  ).slice(0, limit);
 };

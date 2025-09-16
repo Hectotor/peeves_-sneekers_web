@@ -1,7 +1,11 @@
+"use client";
+import { useState } from "react";
 import Image from "next/image";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 
 export default function Home() {
+  type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN';
+  const [brandFilter, setBrandFilter] = useState<BrandFilter>('ALL');
   return (
     <div className="min-h-screen bg-white">
       {/* Section Hero */}
@@ -22,8 +26,12 @@ export default function Home() {
             <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Des sneakers qui vous ressemblent
             </p>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-indigo-100/20 px-3 py-1 ring-1 ring-inset ring-indigo-300/40">
+              <span className="text-xs font-semibold uppercase tracking-wide text-indigo-200">Grandes pointures</span>
+              <span className="text-xs font-medium text-indigo-100">46 – 57</span>
+            </div>
             <p className="mt-3 text-lg text-gray-300">
-              Découvrez notre sélection exclusive de sneakers pour hommes et femmes. Confort, style et qualité supérieure.
+              Découvrez notre sélection exclusive de sneakers. Confort, style et qualité supérieure.
             </p>
             <div className="mt-8">
               <div className="inline-flex rounded-md shadow">
@@ -46,41 +54,23 @@ export default function Home() {
             Nos marques partenaires
           </p>
           <div className="mt-6 grid grid-cols-2 gap-8 md:grid-cols-5">
-            <div className="col-span-1 flex justify-center">
-              <img 
-                className="h-12 w-auto" 
-                src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" 
-                alt="Tuple" 
-              />
-            </div>
-            <div className="col-span-1 flex justify-center">
-              <img 
-                className="h-12 w-auto" 
-                src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" 
-                alt="Mirage" 
-              />
-            </div>
-            <div className="col-span-1 flex justify-center">
-              <img 
-                className="h-12 w-auto" 
-                src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" 
-                alt="StaticKit" 
-              />
-            </div>
-            <div className="col-span-1 flex justify-center">
-              <img 
-                className="h-12 w-auto" 
-                src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" 
-                alt="Transistor" 
-              />
-            </div>
-            <div className="col-span-1 flex justify-center">
-              <img 
-                className="h-12 w-auto" 
-                src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" 
-                alt="Workcation" 
-              />
-            </div>
+            {[
+              { src: '/Courir.svg', alt: 'Courir' },
+              { src: '/JD.L.png', alt: 'JD Sports' },
+              { src: '/Foot_Locker_logo.svg.png', alt: 'Foot Locker' },
+              { src: '/jordan.png', alt: 'Jordan' },
+              { src: '/nike.png', alt: 'Nike' },
+            ].map((brand) => (
+              <div key={brand.alt} className="col-span-1 flex justify-center">
+                <Image
+                  className="h-12 w-auto"
+                  src={brand.src}
+                  alt={brand.alt}
+                  width={160}
+                  height={48}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -90,15 +80,40 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Nos meilleures ventes
+              Tous les produits
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-500">
-              Découvrez les modèles préférés de nos clients
+              Parcourez toutes nos paires disponibles en grandes pointures
             </p>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-indigo-600 font-medium">
+              Spécialisés grandes pointures: 46 à 57
+            </p>
+            {/* Pilules de filtre sous le sous-titre */}
+            <div className="mt-6 flex items-center justify-center gap-3">
+              {[
+                { key: 'ALL', label: 'Tous' },
+                { key: 'NIKE', label: 'Nike' },
+                { key: 'JORDAN', label: 'Jordan' },
+              ].map((pill) => (
+                <button
+                  key={pill.key}
+                  onClick={() => setBrandFilter(pill.key as BrandFilter)}
+                  className={
+                    `rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                      brandFilter === pill.key
+                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
           </div>
           
           <div className="mt-12">
-            <FeaturedProducts />
+            <FeaturedProducts brandFilter={brandFilter} />
           </div>
         </div>
       </div>

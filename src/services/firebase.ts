@@ -17,18 +17,19 @@ const db = getFirestore(app);
 
 export interface Product {
   id: string;
-  gender: string;
-  masterCategory: string;
-  subCategory: string;
-  articleType: string;
-  baseColour: string;
-  season: string;
-  year: number | null;
-  usage: string;
-  productDisplayName: string;
-  quantity: number;
+  name: string;
+  alt: string;
+  final: number | null;
+  original: number | null;
+  price?: number; // Prix calculé pour la rétrocompatibilité
+  currency: string;
+  isOnSale: boolean;
   imageUrl: string;
-  price?: number;
+  quantity: number;
+  brand?: string;
+  category?: string;
+  updatedAt: any; // Firestore Timestamp
+  createdAt: any; // Firestore Timestamp
 }
 
 const productConverter = {
@@ -39,18 +40,18 @@ const productConverter = {
     const data = snapshot.data();
     return {
       id: snapshot.id,
-      gender: data.gender || '',
-      masterCategory: data.masterCategory || '',
-      subCategory: data.subCategory || '',
-      articleType: data.articleType || '',
-      baseColour: data.baseColour || '',
-      season: data.season || '',
-      year: data.year ? Number(data.year) : null,
-      usage: data.usage || '',
-      productDisplayName: data.productDisplayName || '',
-      quantity: data.quantity || 0,
+      name: data.name || '',
+      alt: data.alt || '',
+      final: data.final || null,
+      original: data.original || null,
+      currency: data.currency || 'EUR',
+      isOnSale: data.isOnSale || false,
       imageUrl: data.imageUrl || '',
-      price: data.price || 0
+      quantity: data.quantity || 0,
+      brand: data.brand || 'Nike',
+      category: data.category || 'Sneakers',
+      updatedAt: data.updatedAt,
+      createdAt: data.createdAt
     };
   }
 };
