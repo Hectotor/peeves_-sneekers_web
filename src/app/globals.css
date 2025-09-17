@@ -30,3 +30,21 @@ input.no-spinner[type=number] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* Confetti effect */
+.confetti-piece {
+  position: fixed;
+  top: -12px;
+  width: 8px;
+  height: 12px;
+  opacity: 0.9;
+  z-index: 9999;
+  pointer-events: none;
+  animation-name: confetti-fall;
+  animation-timing-function: linear;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 1; }
+}

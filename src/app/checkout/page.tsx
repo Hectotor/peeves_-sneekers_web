@@ -84,12 +84,12 @@ export default function CheckoutPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-600">Chargement…</div>;
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-600">Chargement…</div>;
   }
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center text-gray-700">
           <p>Votre panier est vide.</p>
           <button onClick={() => router.push("/")} className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500">Retour à l'accueil</button>
@@ -99,7 +99,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-screen-lg px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-screen-lg px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-2xl font-bold text-gray-900">Checkout (simulation)</h1>
       <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
@@ -139,6 +140,7 @@ export default function CheckoutPage() {
           </button>
           <p className="mt-3 text-xs text-gray-500">Ce paiement est simulé: aucun prélèvement réel ne sera effectué.</p>
         </div>
+      </div>
       </div>
     </div>
   );

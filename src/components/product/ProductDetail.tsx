@@ -11,6 +11,31 @@ type Props = {
 export default function ProductDetail({ product }: Props) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const launchConfetti = () => {
+    if (typeof window === "undefined") return;
+    const colors = ["#6366F1", "#22C55E", "#F59E0B", "#EF4444", "#06B6D4", "#A855F7"];
+    const count = 50;
+    const duration = 1200; // ms
+    const pieces: HTMLElement[] = [];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("span");
+      el.className = "confetti-piece";
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.background = colors[i % colors.length];
+      el.style.animationDuration = 800 + Math.random() * 1200 + "ms";
+      el.style.animationDelay = Math.random() * 200 + "ms";
+      el.style.transform = `translateY(-10px) rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(el);
+      pieces.push(el);
+    }
+    // Cleanup
+    setTimeout(() => {
+      pieces.forEach((el) => el.remove());
+    }, duration + 800);
+  };
 
   const priceFormatter = useMemo(
     () =>
@@ -22,8 +47,12 @@ export default function ProductDetail({ product }: Props) {
   );
 
   const sizes = useMemo(() => Array.from({ length: 12 }, (_, i) => String(46 + i)), []); // 46..57
-
-  const inStock = (product.quantity ?? 0) > 0;
+  // Stock total basé sur sizes
+  const totalStock = useMemo(() => {
+    const map = product.sizes || {};
+    return Object.values(map).reduce((acc, entry: any) => acc + (Number(entry?.quantity) || 0), 0);
+  }, [product.sizes]);
+  const inStock = totalStock > 0;
 
   const handleAddToCart = async () => {
     if (!selectedSize) return;
@@ -46,6 +75,12 @@ export default function ProductDetail({ product }: Props) {
         localStorage.setItem("cart", JSON.stringify(cart));
         // Notify listeners (e.g., Navbar) that the cart changed
         window.dispatchEvent(new Event("cart:updated"));
+        // Success UI feedback
+        setJustAdded(true);
+        setToast("Ajouté au panier");
+        setTimeout(() => setJustAdded(false), 900);
+        setTimeout(() => setToast(null), 1500);
+        launchConfetti();
       }
     } finally {
       setAdding(false);
@@ -117,15 +152,21 @@ export default function ProductDetail({ product }: Props) {
             <div className="mt-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
               {sizes.map((size) => {
                 const selected = selectedSize === size;
+                const qty = Number(product.sizes?.[size]?.quantity || 0);
+                const disabled = qty <= 0;
                 return (
                   <button
                     type="button"
                     key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`rounded-md border px-3 py-2 text-sm ${
-                      selected
-                        ? "border-indigo-600 bg-indigo-600 text-white"
-                        : "border-gray-300 bg-white text-gray-800 hover:bg-gray-50"
+                    onClick={() => !disabled && setSelectedSize(size)}
+                    disabled={disabled}
+                    title={disabled ? "Rupture" : `Stock: ${qty}`}
+                    className={`rounded-md border px-3 py-2 text-sm transition-colors ${
+                      disabled
+                        ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : selected
+                          ? "border-indigo-600 bg-indigo-600 text-white"
+                          : "border-gray-300 bg-white text-gray-800 hover:bg-gray-50"
                     }`}
                   >
                     {size}
@@ -137,26 +178,54 @@ export default function ProductDetail({ product }: Props) {
 
           {/* Actions */}
           <div className="mt-8 flex items-center gap-4">
-            <button
-              type="button"
-              disabled={!selectedSize || !inStock || adding}
-              onClick={handleAddToCart}
-              className={`inline-flex items-center justify-center rounded-md px-5 py-3 text-base font-medium transition-colors ${
-                !selectedSize || !inStock || adding
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-500"
-              }`}
-            >
-              Ajouter au panier
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                disabled={!selectedSize || !inStock || adding}
+                onClick={handleAddToCart}
+                className={`inline-flex items-center justify-center rounded-md px-5 py-3 text-base font-medium transition-all duration-200 ${
+                  !selectedSize || !inStock || adding
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : `bg-indigo-600 text-white hover:bg-indigo-500 ${justAdded ? 'scale-[1.02]' : ''}`
+                }`}
+              >
+                {adding ? (
+                  <>
+                    <svg className="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    Ajout en cours…
+                  </>
+                ) : (
+                  <>Ajouter au panier</>
+                )}
+              </button>
+              {justAdded && (
+                <span className="pointer-events-none absolute -inset-1 rounded-md bg-indigo-400/30 animate-ping"></span>
+              )}
+            </div>
             <div className="text-sm text-gray-500">
               {inStock ? (
-                <span>En stock: {product.quantity}</span>
+                selectedSize ? (
+                  <span>
+                    Disponible: {Number(product.sizes?.[selectedSize]?.quantity || 0)}
+                  </span>
+                ) : (
+                  <span>En stock: {totalStock}</span>
+                )
               ) : (
                 <span className="text-red-600">Rupture de stock</span>
               )}
             </div>
           </div>
+          {toast && (
+            <div className="fixed left-1/2 bottom-6 z-50 -translate-x-1/2">
+              <div className="rounded-md bg-gray-900/90 text-white px-4 py-2 text-sm shadow-lg">
+                {toast}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

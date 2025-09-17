@@ -62,6 +62,14 @@ async function importCsvToFirestore() {
       const finalPrice = row['price.final'] ? 
         parseFloat(row['price.final'].replace('€', '').trim().replace(',', '.')) : null;
       
+      // Générer des quantités par pointure (sizes)
+      // Exemple: tailles 46 à 57 avec quantités aléatoires 0..20
+      const sizes = {};
+      for (let s = 46; s <= 57; s++) {
+        const qty = Math.floor(Math.random() * 21); // 0..20
+        sizes[String(s)] = qty;
+      }
+
       // Préparer les données pour Firestore
       const productData = {
         id: docRef.id,
@@ -72,7 +80,7 @@ async function importCsvToFirestore() {
         currency: 'EUR',
         isOnSale: !!originalPrice && (originalPrice > finalPrice),
         imageUrl: row['image'] || '',
-        quantity: Math.floor(Math.random() * 100), // Quantité aléatoire entre 0 et 100
+        sizes, // quantités par pointure
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };

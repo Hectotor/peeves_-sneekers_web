@@ -27,7 +27,7 @@ export interface Product {
   currency: string;
   isOnSale: boolean;
   imageUrl: string;
-  quantity: number;
+  sizes: Record<string, { quantity: number }>;
   brand?: string;
   category?: string;
   updatedAt: any; // Firestore Timestamp
@@ -40,6 +40,13 @@ const productConverter = {
   }),
   fromFirestore: (snapshot: QueryDocumentSnapshot): Product => {
     const data = snapshot.data();
+    // Normaliser sizes -> { [size]: { quantity } }
+    const rawSizes = data.sizes || {};
+    const sizes: Record<string, { quantity: number }> = {};
+    Object.keys(rawSizes || {}).forEach((k) => {
+      const v = rawSizes[k];
+      sizes[k] = typeof v === 'number' ? { quantity: v } : { quantity: Number(v?.quantity) || 0 };
+    });
     return {
       id: snapshot.id,
       name: data.name || '',
@@ -49,7 +56,7 @@ const productConverter = {
       currency: data.currency || 'EUR',
       isOnSale: data.isOnSale || false,
       imageUrl: data.imageUrl || '',
-      quantity: data.quantity || 0,
+      sizes,
       brand: data.brand || 'Nike',
       category: data.category || 'Sneakers',
       updatedAt: data.updatedAt,

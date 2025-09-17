@@ -142,7 +142,7 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
                       </Link>
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      En stock: {product.quantity}
+                      En stock: {Object.values(product.sizes ?? {}).reduce((acc, s: any) => acc + (Number(s?.quantity) || 0), 0)}
                     </p>
                   </div>
                   {(() => {
