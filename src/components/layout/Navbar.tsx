@@ -5,7 +5,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, type User, getIdTokenResult } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +22,7 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const [cartCount, setCartCount] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
 
   // Read cart from localStorage and update count
@@ -47,7 +48,19 @@ export default function Navbar() {
     };
     window.addEventListener('cart:updated', onCustom as EventListener);
     window.addEventListener('storage', onStorage);
-    const unsub = onAuthStateChanged(auth, (u) => setCurrentUser(u));
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setCurrentUser(u);
+      if (u) {
+        try {
+          const token = await getIdTokenResult(u, true);
+          setIsAdmin(!!token.claims?.admin);
+        } catch {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    });
     return () => {
       window.removeEventListener('cart:updated', onCustom as EventListener);
       window.removeEventListener('storage', onStorage);
@@ -68,6 +81,11 @@ export default function Navbar() {
                       <div className="text-xs md:text-sm font-semibold uppercase tracking-widest text-gray-600">sneakers</div>
                     </div>
                   </Link>
+                  {isAdmin && (
+                    <span className="ml-3 hidden sm:inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-200">
+                      Admin
+                    </span>
+                  )}
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   {navigation.map((item) => (
@@ -123,6 +141,39 @@ export default function Navbar() {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      {isAdmin && (
+                        <>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button
+                                type="button"
+                                onClick={() => router.push('/admin/orders')}
+                                className={classNames(
+                                  active ? 'bg-gray-100' : '',
+                                  'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                                )}
+                              >
+                                Admin commandes
+                              </button>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button
+                                type="button"
+                                onClick={() => router.push('/admin/stock')}
+                                className={classNames(
+                                  active ? 'bg-gray-100' : '',
+                                  'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                                )}
+                              >
+                                Admin stock
+                              </button>
+                            )}
+                          </Menu.Item>
+                          <div className="my-1 border-t border-gray-100" />
+                        </>
+                      )}
                       <Menu.Item>
                         {({ active }) => (
                           <button
