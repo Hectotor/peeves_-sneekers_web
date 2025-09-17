@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
   const params = useSearchParams();
   const orderId = params.get("orderId");
   return (
@@ -18,5 +19,17 @@ export default function CheckoutSuccessPage() {
         <Link href="/" className="mt-6 inline-flex rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500">Retour à l'accueil</Link>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-gray-600">Chargement…</div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
