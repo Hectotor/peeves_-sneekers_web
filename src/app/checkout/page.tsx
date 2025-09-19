@@ -100,6 +100,14 @@ export default function CheckoutPage() {
         createdAt: serverTimestamp(),
       };
       const ref = await addDoc(collection(db, "orders"), order);
+      // Simulate email: confirmation
+      try {
+        const to = user.email || 'client@example.com';
+        const subject = `Confirmation de votre commande #${ref.id}`;
+        const body = `Bonjour,\n\nMerci pour votre commande #${ref.id}. Montant: ${price.format(totals.total)}.\nNous vous informerons dès l'expédition.\n\n— Peeves Sneakers`;
+        console.log('[SIMULATEUR EMAIL] To:', to, '\nSubject:', subject, '\nBody:\n', body);
+        alert(`Email de confirmation (simulation) envoyé à ${to}.`);
+      } catch {}
       // Clear cart
       localStorage.setItem("cart", JSON.stringify([]));
       window.dispatchEvent(new Event("cart:updated"));
