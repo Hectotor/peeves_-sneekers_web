@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   const navigation = {
@@ -25,7 +26,7 @@ export default function Footer() {
     ],
     legal: [
       { name: 'Mentions légales', href: '#' },
-      { name: 'CGV', href: '#' },
+      { name: 'CGV', href: '/cgv' },
       { name: 'Politique de confidentialité', href: '#' },
       { name: 'Politique des cookies', href: '#' },
     ],
@@ -147,9 +148,18 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
-          <p className="text-xs leading-5 text-gray-400">
-            &copy; {new Date().getFullYear()} Peeves Sneakers. Tous droits réservés.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <p className="text-xs leading-5 text-gray-400">
+              &copy; {new Date().getFullYear()} Peeves Sneakers. Tous droits réservés.
+            </p>
+            <div className="flex items-center gap-4 opacity-90">
+              <Image src="/maestro.png" alt="Maestro" width={38} height={24} className="h-6 w-auto" />
+              <Image src="/Mastercard-logo.svg.png" alt="Mastercard" width={38} height={24} className="h-6 w-auto" />
+              <Image src="/visa.png" alt="Visa" width={38} height={24} className="h-6 w-auto" />
+              <Image src="/pay.png" alt="Pay" width={38} height={24} className="h-6 w-auto" />
+              <Image src="/PayPal.svg.png" alt="PayPal" width={38} height={24} className="h-6 w-auto" />
+            </div>
+          </div>
         </div>
       </div>
     </footer>
