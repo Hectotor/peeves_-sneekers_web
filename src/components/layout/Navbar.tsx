@@ -161,6 +161,20 @@ export default function Navbar() {
                             {({ active }) => (
                               <button
                                 type="button"
+                                onClick={() => router.push('/admin/revenue')}
+                                className={classNames(
+                                  active ? 'bg-gray-100' : '',
+                                  'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                                )}
+                              >
+                                Admin chiffre d'affaires
+                              </button>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button
+                                type="button"
                                 onClick={() => router.push('/admin/stock')}
                                 className={classNames(
                                   active ? 'bg-gray-100' : '',
