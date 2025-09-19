@@ -48,31 +48,38 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Section marques */}
+      {/* Section marques (marquee) */}
       <div className="bg-gray-50 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm font-semibold uppercase tracking-wide text-gray-500">
             Nos marques partenaires
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-8 md:grid-cols-5">
-            {[
+          {(() => {
+            const brands = [
               { src: '/Courir.svg', alt: 'Courir' },
               { src: '/JD.L.png', alt: 'JD Sports' },
               { src: '/Foot_Locker_logo.svg.png', alt: 'Foot Locker' },
               { src: '/jordan.png', alt: 'Jordan' },
               { src: '/nike.png', alt: 'Nike' },
-            ].map((brand) => (
-              <div key={brand.alt} className="col-span-1 flex justify-center">
-                <Image
-                  className="h-12 w-auto"
-                  src={brand.src}
-                  alt={brand.alt}
-                  width={160}
-                  height={48}
-                />
+            ];
+            return (
+              <div className="mt-6 marquee">
+                <div className="marquee-track py-2">
+                  {[...brands, ...brands].map((brand, idx) => (
+                    <div key={`${brand.alt}-${idx}`} className="flex items-center justify-center">
+                      <Image
+                        className="h-12 w-auto opacity-80 hover:opacity-100 transition"
+                        src={brand.src}
+                        alt={brand.alt}
+                        width={160}
+                        height={48}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </div>
       </div>
 

@@ -48,3 +48,25 @@ input.no-spinner[type=number] {
   0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 1; }
 }
+
+/* Marquee (left-to-right) */
+.marquee {
+  overflow: hidden;
+  position: relative;
+  /* soft fade on edges */
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 6rem; /* further increased space between items */
+  width: max-content;
+  animation: marquee-rtl 30s linear infinite;
+  will-change: transform;
+}
+
+@keyframes marquee-rtl {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
