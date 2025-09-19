@@ -109,6 +109,14 @@ export default function AdminOrdersPage() {
     });
   }, [orders, profiles, searchQuery]);
 
+  const statusLabel = (s?: string) => {
+    const v = (s || '').toLowerCase();
+    if (v === 'paid') return 'Payée';
+    if (v === 'prepared') return 'Préparée';
+    if (v === 'shipped') return 'Expédiée';
+    return s || '—';
+  };
+
   if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-600">Chargement…</div>;
   if (!isAdmin) return null;
 
@@ -183,9 +191,11 @@ export default function AdminOrdersPage() {
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                           (o.status || '').toLowerCase() === 'prepared'
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-700'
+                            : (o.status || '').toLowerCase() === 'shipped'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-700'
                         }`}>
-                          {o.status || "—"}
+                          {statusLabel(o.status)}
                         </span>
                         {((o.status || '').toLowerCase() !== 'prepared') ? (
                           <button
@@ -224,6 +234,46 @@ export default function AdminOrdersPage() {
                             }}
                           >
                             Annuler préparée
+                          </button>
+                        )}
+                        {((o.status || '').toLowerCase() !== 'shipped') && (
+                          <button
+                            className={`rounded border px-2 py-0.5 text-xs ${savingIds[o.id] ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'} `}
+                            disabled={!!savingIds[o.id]}
+                            onClick={async () => {
+                              try {
+                                setSavingIds((s) => ({ ...s, [o.id]: true }));
+                                const ref = fsDoc(db, 'orders', o.id);
+                                await updateDoc(ref, { status: 'shipped' });
+                                setOrders((prev) => prev.map((x) => x.id === o.id ? { ...x, status: 'shipped' } : x));
+                              } catch (e) {
+                                alert('Impossible de marquer la commande comme expédiée.');
+                              } finally {
+                                setSavingIds((s) => ({ ...s, [o.id]: false }));
+                              }
+                            }}
+                          >
+                            Marquer expédiée
+                          </button>
+                        )}
+                        {((o.status || '').toLowerCase() === 'shipped') && (
+                          <button
+                            className={`rounded border px-2 py-0.5 text-xs ${savingIds[o.id] ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'} `}
+                            disabled={!!savingIds[o.id]}
+                            onClick={async () => {
+                              try {
+                                setSavingIds((s) => ({ ...s, [o.id]: true }));
+                                const ref = fsDoc(db, 'orders', o.id);
+                                await updateDoc(ref, { status: 'prepared' });
+                                setOrders((prev) => prev.map((x) => x.id === o.id ? { ...x, status: 'prepared' } : x));
+                              } catch (e) {
+                                alert('Impossible d\'annuler l\'état expédiée.');
+                              } finally {
+                                setSavingIds((s) => ({ ...s, [o.id]: false }));
+                              }
+                            }}
+                          >
+                            Annuler expédiée
                           </button>
                         )}
                       </div>

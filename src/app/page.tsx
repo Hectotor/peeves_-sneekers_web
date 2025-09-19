@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 
@@ -7,6 +8,25 @@ export default function Home() {
   type BrandFilter = 'ALL' | 'NIKE' | 'JORDAN' | 'PROMOS';
   const [brandFilter, setBrandFilter] = useState<BrandFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [cookieConsent, setCookieConsent] = useState<'accepted' | 'refused' | null>(null);
+
+  // Cookie consent: read once on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cookieConsent');
+      if (saved === 'accepted' || saved === 'refused') setCookieConsent(saved as any);
+      else setCookieConsent(null);
+    } catch {}
+  }, []);
+
+  const acceptCookies = () => {
+    try { localStorage.setItem('cookieConsent', 'accepted'); } catch {}
+    setCookieConsent('accepted');
+  };
+  const refuseCookies = () => {
+    try { localStorage.setItem('cookieConsent', 'refused'); } catch {}
+    setCookieConsent('refused');
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Section Hero */}
@@ -146,6 +166,39 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Cookie consent banner (centered) */}
+      {cookieConsent === null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/30" aria-hidden="true" />
+          <div className="relative w-full max-w-3xl rounded-xl border border-gray-200 bg-white p-5 shadow-2xl">
+            <h3 className="text-center text-lg font-semibold text-gray-900">Paramètres des cookies</h3>
+            <p className="mt-2 text-center text-base text-gray-700">
+              Nous utilisons des cookies pour améliorer votre expérience, mesurer l'audience et sécuriser le site.
+              Vous pouvez accepter ou refuser les cookies non essentiels.
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={refuseCookies}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Refuser
+              </button>
+              <button
+                type="button"
+                onClick={acceptCookies}
+                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+              >
+                Accepter
+              </button>
+            </div>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              En savoir plus dans notre <a href="/cookies" className="underline hover:text-indigo-600">Politique des cookies</a>.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

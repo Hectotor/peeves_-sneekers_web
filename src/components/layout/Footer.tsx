@@ -25,10 +25,10 @@ export default function Footer() {
       { name: 'Presse', href: '#' },
     ],
     legal: [
-      { name: 'Mentions légales', href: '#' },
+      { name: 'Mentions légales', href: '/mentions-legales' },
       { name: 'CGV', href: '/cgv' },
       { name: 'Politique de confidentialité', href: '#' },
-      { name: 'Politique des cookies', href: '#' },
+      { name: 'Politique des cookies', href: '/cookies' },
     ],
     social: [
       {

@@ -101,6 +101,14 @@ export default function AdminRevenuePage() {
     return { totalRevenue, totalOrders, totalItems, avgOrder };
   }, [filtered]);
 
+  const statusLabel = (s?: string) => {
+    const v = (s || '').toLowerCase();
+    if (v === 'paid') return 'Payée';
+    if (v === 'prepared') return 'Préparée';
+    if (v === 'shipped') return 'Expédiée';
+    return s || '—';
+  };
+
   // Build daily revenue series for the selected period
   const dailySeries = useMemo(() => {
     // Group by YYYY-MM-DD
@@ -230,7 +238,7 @@ export default function AdminRevenuePage() {
                     <td className="px-4 py-2 text-right font-medium">{price.format(o.amount || 0)}</td>
                     <td className="px-4 py-2">
                       <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                        {o.status || '—'}
+                        {statusLabel(o.status)}
                       </span>
                     </td>
                   </tr>

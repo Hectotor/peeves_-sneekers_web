@@ -31,6 +31,14 @@ export default function OrdersPage() {
     []
   );
 
+  function statusLabel(s?: string) {
+    const v = (s || '').toLowerCase();
+    if (v === 'paid') return 'Payée';
+    if (v === 'prepared') return 'Préparée';
+    if (v === 'shipped') return 'Expédiée';
+    return s || '—';
+  }
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (!u) {
@@ -124,7 +132,7 @@ export default function OrdersPage() {
                     </div>
                     <div>
                       <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                        {o.status || "—"}
+                        {statusLabel(o.status)}
                       </span>
                     </div>
                     <div>
