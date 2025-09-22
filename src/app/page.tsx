@@ -104,16 +104,29 @@ export default function Home() {
       </div>
 
       {/* Section Produits en vedette */}
-      <div id="collection" className="bg-white py-16 sm:py-24">
-        <div className="mx-auto w-full max-w-none px-1 sm:px-2 lg:px-3">
+      <div 
+        id="collection" 
+        className="relative py-16 sm:py-24 overflow-hidden"
+      >
+        {/* Arrière-plan avec image */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://images.unsplash.com/photo-1597045566677-8cf032ed6634?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+        <div className="mx-auto w-full max-w-none px-1 sm:px-2 lg:px-3 relative z-10">
           <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Tous les produits
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-500">
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-white">
               Parcourez toutes nos paires disponibles en grandes pointures
             </p>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-indigo-600 font-medium">
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-white font-medium">
               Spécialisés grandes pointures: 46 à 57
             </p>
             {/* Pilules de filtre sous le sous-titre */}
@@ -166,6 +179,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {/* Fin de la section Produits en vedette */}
 
       {/* Cookie consent banner (centered) */}
       {cookieConsent === null && (
