@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, getIdTokenResult, type User } from "firebase/auth";
 import { auth, db } from "@/services/firebase";
-import { collection, getDocs, orderBy, query, doc as fsDoc, updateDoc, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, doc as fsDoc, updateDoc, deleteDoc, serverTimestamp, addDoc } from "firebase/firestore";
 import type { Product } from "@/services/firebase";
 
 export default function AdminStockPage() {
@@ -135,6 +135,27 @@ export default function AdminStockPage() {
   const cancelEdit = () => {
     setEditingId(null);
     setDraftSizes({});
+  };
+
+  const deleteProduct = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement ce produit ? Cette action est irréversible.')) {
+      return;
+    }
+    
+    try {
+      setSavingId(id);
+      // Suppression définitive du document
+      await deleteDoc(fsDoc(db, 'products', id));
+      
+      // Mise à jour locale de la liste des produits
+      setProducts(products.filter(p => p.id !== id));
+      alert('Produit supprimé avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la suppression du produit:', error);
+      alert('Une erreur est survenue lors de la suppression du produit');
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const saveEdit = async (id: string) => {
@@ -305,32 +326,52 @@ export default function AdminStockPage() {
                   </td>
                   <td className="px-4 py-2 align-top">
                     {editingId === p.id ? (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className={`flex-1 rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500 ${savingId === p.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                            onClick={() => saveEdit(p.id)}
+                            disabled={savingId === p.id}
+                          >
+                            Enregistrer
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                            onClick={cancelEdit}
+                            disabled={savingId === p.id}
+                          >
+                            Annuler
+                          </button>
+                        </div>
                         <button
                           type="button"
-                          className={`rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500 ${savingId === p.id ? 'opacity-60 cursor-not-allowed' : ''}`}
-                          onClick={() => saveEdit(p.id)}
+                          className={`w-full rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 ${savingId === p.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          onClick={() => deleteProduct(p.id)}
                           disabled={savingId === p.id}
                         >
-                          Enregistrer
-                        </button>
-                        <button
-                          type="button"
-                          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                          onClick={cancelEdit}
-                          disabled={savingId === p.id}
-                        >
-                          Annuler
+                          {savingId === p.id ? 'Suppression...' : 'Supprimer le produit'}
                         </button>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                        onClick={() => startEdit(p)}
-                      >
-                        Modifier
-                      </button>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          type="button"
+                          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          onClick={() => startEdit(p)}
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+                          onClick={() => deleteProduct(p.id)}
+                          disabled={savingId === p.id}
+                        >
+                          {savingId === p.id ? 'Suppression...' : 'Supprimer'}
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
