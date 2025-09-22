@@ -6,6 +6,17 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/
 import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function RegisterPage() {
+  const backgroundStyle = {
+    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url("https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2rem 0',
+  };
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
@@ -69,8 +80,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div style={backgroundStyle}>
+      <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm mx-auto my-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
           <p className="mt-1 text-sm text-gray-600">Renseignez vos informations pour créer votre compte.</p>

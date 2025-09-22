@@ -81,7 +81,7 @@ export default function Footer() {
               <span className="text-2xl font-bold">Peeves Sneakers</span>
             </div>
             <p className="text-sm leading-6 text-gray-300">
-              Votre destination pour les sneakers tendance et confortables. Livraison rapide et paiement sécurisé.
+              La référence des sneakers pour grands pieds. Confort optimal, styles tendance et tailles étendues jusqu'au 57. Livraison rapide et retour gratuit.
             </p>
             <div className="flex space-x-6">
               {navigation.social.map((item) => (

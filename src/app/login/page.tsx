@@ -6,6 +6,17 @@ import { auth } from "@/services/firebase";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const backgroundStyle = {
+    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url("https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2rem 0',
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div style={backgroundStyle}>
       <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">Connexion</h1>
