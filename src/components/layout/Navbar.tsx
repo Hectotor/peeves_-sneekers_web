@@ -220,26 +220,28 @@ export default function Navbar() {
                           </button>
                         )}
                       </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              try {
-                                await signOut(auth);
-                              } finally {
-                                router.push('/login');
-                              }
-                            }}
-                            className={classNames(
-                              active ? 'bg-gray-100' : '',
-                              'block w-full text-left px-4 py-2 text-sm text-gray-700'
-                            )}
-                          >
-                            Se déconnecter
-                          </button>
-                        )}
-                      </Menu.Item>
+                      {currentUser && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  await signOut(auth);
+                                } finally {
+                                  router.push('/login');
+                                }
+                              }}
+                              className={classNames(
+                                active ? 'bg-gray-100' : '',
+                                'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                              )}
+                            >
+                              Se déconnecter
+                            </button>
+                          )}
+                        </Menu.Item>
+                      )}
                     </Menu.Items>
                   </Transition>
                 </Menu>
@@ -319,13 +321,15 @@ export default function Navbar() {
                 >
                   Commandes
                 </Disclosure.Button>
-                <Disclosure.Button
-                  as="a"
-                  href="#"
-                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                >
-                  Se déconnecter
-                </Disclosure.Button>
+                {currentUser && (
+                  <Disclosure.Button
+                    as="a"
+                    href="#"
+                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  >
+                    Se déconnecter
+                  </Disclosure.Button>
+                )}
               </div>
             </div>
           </Disclosure.Panel>

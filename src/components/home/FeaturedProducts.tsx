@@ -76,15 +76,11 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="md:flex md:items-center md:justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">Nouveautés</h2>
-          <Link 
-            href="/shop" 
-            className="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block transition-colors duration-200"
-          >
+          <a href="#collection" className="inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
             Parcourir la collection
-            <span aria-hidden="true"> &rarr;</span>
-          </Link>
+          </a>
         </div>
 
         {products.length === 0 ? (
@@ -248,15 +244,9 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
         )}
 
         <div className="mt-8 text-center md:hidden">
-          <Link 
-            href="/shop" 
-            className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
-          >
+          <a href="#collection" className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500">
             Parcourir la collection
-            <svg className="ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Link>
+          </a>
         </div>
       </div>
     </div>

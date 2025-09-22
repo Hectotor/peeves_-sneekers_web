@@ -57,7 +57,7 @@ export default function Home() {
             <div className="mt-8">
               <div className="inline-flex rounded-md shadow">
                 <a
-                  href="#"
+                  href="#collection"
                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-indigo-600 hover:bg-gray-50"
                 >
                   Découvrir la collection
@@ -104,7 +104,7 @@ export default function Home() {
       </div>
 
       {/* Section Produits en vedette */}
-      <div className="bg-white py-16 sm:py-24">
+      <div id="collection" className="bg-white py-16 sm:py-24">
         <div className="mx-auto w-full max-w-none px-1 sm:px-2 lg:px-3">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
