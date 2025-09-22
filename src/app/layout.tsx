@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const poppins = Poppins({ subsets: ['latin'], weight: ['400','500','600','700','800'] });
 
 export const metadata: Metadata = {
   title: 'Peeves Sneakers — Sneakers pour grands pieds (pointures larges et grandes tailles)',
@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} bg-gray-50 text-gray-900`}>
+      <body className={`${poppins.className} bg-gray-50 text-gray-900`}>
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow">
