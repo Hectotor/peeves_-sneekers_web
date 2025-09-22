@@ -16,10 +16,17 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    if (!acceptedTerms) {
+      setError("Veuvez accepter les conditions générales de vente pour continuer.");
+      return;
+    }
+    
     setLoading(true);
     try {
       // Create auth user
@@ -111,9 +118,41 @@ export default function RegisterPage() {
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200">{error}</div>
           )}
 
-          <button type="submit" disabled={loading} className={`w-full rounded-md bg-indigo-600 px-4 py-2.5 text-white hover:bg-indigo-500 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}>
-            {loading ? "Création..." : "Créer le compte"}
-          </button>
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="terms" className="font-medium text-gray-700">
+                J'accepte les{' '}
+                <a 
+                  href="/mentions-legales" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:text-indigo-500"
+                >
+                  conditions générales de vente
+                </a>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading || !acceptedTerms}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-400"
+            >
+              {loading ? 'Création en cours...' : 'Créer mon compte'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
