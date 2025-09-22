@@ -308,24 +308,34 @@ export default function Navbar() {
               </div>
               <div className="mt-3 space-y-1">
                 <Disclosure.Button
-                  as="a"
-                  href="#"
-                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  as="button"
+                  onClick={() => {
+                    if (!currentUser) router.push('/login'); else router.push('/account');
+                  }}
+                  className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                 >
                   Mon profil
                 </Disclosure.Button>
                 <Disclosure.Button
-                  as="a"
-                  href="#"
-                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  as="button"
+                  onClick={() => {
+                    if (!currentUser) router.push('/login'); else router.push('/orders');
+                  }}
+                  className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                 >
                   Commandes
                 </Disclosure.Button>
                 {currentUser && (
                   <Disclosure.Button
-                    as="a"
-                    href="#"
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                    as="button"
+                    onClick={async () => {
+                      try {
+                        await signOut(auth);
+                      } finally {
+                        router.push('/login');
+                      }
+                    }}
+                    className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                   >
                     Se déconnecter
                   </Disclosure.Button>
