@@ -14,6 +14,8 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const ITEMS_PER_PAGE = 25;
+  const [sortOrder, setSortOrder] = useState<'none' | 'asc' | 'desc'>('none');
+  const [selectedSize, setSelectedSize] = useState<number | null>(null);
  
   const priceFormatter = new Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -40,6 +42,16 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
   useEffect(() => {
     setCurrentPage(1);
   }, [brandFilter, searchQuery]);
+
+  // Réinitialiser la pagination lorsque l'ordre de tri change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortOrder]);
+
+  // Réinitialiser la pagination lorsque la taille change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSize]);
 
   if (loading) {
     return (
@@ -76,11 +88,50 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">Nouveautés</h2>
-          <a href="#collection" className="inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
-            Parcourir la collection
-          </a>
+          <div className="flex flex-1 justify-center">
+            <div className="flex flex-wrap items-center gap-2">
+              {Array.from({ length: 12 }, (_, i) => 46 + i).map((size) => (
+                <button
+                  key={size}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition ${
+                    selectedSize === size
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSelectedSize((prev) => (prev === size ? null : size))}
+                  aria-pressed={selectedSize === size}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="inline-flex items-center gap-2">
+            <button
+              className={`px-3 py-1.5 text-sm rounded border ${
+                sortOrder === 'asc'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+              onClick={() => setSortOrder('asc')}
+              aria-pressed={sortOrder === 'asc'}
+            >
+              Prix ↑
+            </button>
+            <button
+              className={`px-3 py-1.5 text-sm rounded border ${
+                sortOrder === 'desc'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+              onClick={() => setSortOrder('desc')}
+              aria-pressed={sortOrder === 'desc'}
+            >
+              Prix ↓
+            </button>
+          </div>
         </div>
 
         {products.length === 0 ? (
@@ -103,11 +154,31 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
                   }
                   return true;
                 });
+                // Filtre taille sélectionnée (quantité > 0)
+                const matchesSize = (p: Product) => {
+                  if (selectedSize === null) return true;
+                  const sizes: any = (p as any).sizes ?? {};
+                  const entry = sizes[String(selectedSize)];
+                  const qty = Number(entry?.quantity) || 0;
+                  return qty > 0;
+                };
+                const bySize = filtered.filter(matchesSize);
                 const q = searchQuery.trim().toLowerCase();
-                const filteredBySearch = q ? filtered.filter(p => (p.name || '').toLowerCase().includes(q)) : filtered;
-                const totalPages = Math.max(1, Math.ceil(filteredBySearch.length / ITEMS_PER_PAGE));
+                const filteredBySearch = q ? bySize.filter(p => (p.name || '').toLowerCase().includes(q)) : bySize;
+                // Tri par prix (final puis original) - seulement si l'utilisateur choisit un ordre
+                const getPrice = (p: Product) => (typeof p.final === 'number' ? p.final : (typeof p.original === 'number' ? p.original : 0));
+                const base = filteredBySearch;
+                const sorted =
+                  sortOrder === 'none'
+                    ? base
+                    : [...base].sort((a, b) => {
+                        const pa = getPrice(a);
+                        const pb = getPrice(b);
+                        return sortOrder === 'asc' ? pa - pb : pb - pa;
+                      });
+                const totalPages = Math.max(1, Math.ceil(sorted.length / ITEMS_PER_PAGE));
                 const start = (currentPage - 1) * ITEMS_PER_PAGE;
-                const pageItems = filteredBySearch.slice(start, start + ITEMS_PER_PAGE);
+                const pageItems = sorted.slice(start, start + ITEMS_PER_PAGE);
                 return pageItems.map((product) => (
               <div key={product.id} className="group relative">
                 <div className="relative w-full overflow-hidden rounded-md bg-white border border-gray-100 aspect-square group-hover:opacity-90">
@@ -244,9 +315,30 @@ export default function FeaturedProducts({ brandFilter = 'ALL', searchQuery = ''
         )}
 
         <div className="mt-8 text-center md:hidden">
-          <a href="#collection" className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500">
-            Parcourir la collection
-          </a>
+          <div className="inline-flex items-center gap-2">
+            <button
+              className={`px-3 py-1.5 text-sm rounded border ${
+                sortOrder === 'asc'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'text-indigo-600 border-gray-300 hover:bg-gray-50'
+              }`}
+              onClick={() => setSortOrder('asc')}
+              aria-pressed={sortOrder === 'asc'}
+            >
+              Prix ↑
+            </button>
+            <button
+              className={`px-3 py-1.5 text-sm rounded border ${
+                sortOrder === 'desc'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'text-indigo-600 border-gray-300 hover:bg-gray-50'
+              }`}
+              onClick={() => setSortOrder('desc')}
+              aria-pressed={sortOrder === 'desc'}
+            >
+              Prix ↓
+            </button>
+          </div>
         </div>
       </div>
     </div>
