@@ -6,17 +6,13 @@ const nextConfig: NextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   images: {
-    domains: [
-      'images.unsplash.com', 
-      'tailwindui.com', 
-      'via.placeholder.com', 
-      'storage.googleapis.com',
-      'images.footlocker.com'
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'tailwindui.com' },
+      { protocol: 'https', hostname: 'via.placeholder.com' },
+      { protocol: 'https', hostname: 'storage.googleapis.com' },
+      { protocol: 'https', hostname: 'images.footlocker.com' },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
-    return config;
   },
 };
 

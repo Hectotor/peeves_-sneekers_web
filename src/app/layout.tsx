@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer';
 const poppins = Poppins({ subsets: ['latin'], weight: ['400','500','600','700','800'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: 'Peeves Sneakers — Sneakers pour grands pieds (pointures larges et grandes tailles)',
   description:
     "Boutique spécialisée en grandes pointures et pieds larges. Découvrez des sneakers confortables et stylées, du quotidien à la performance, avec des tailles étendues.",
